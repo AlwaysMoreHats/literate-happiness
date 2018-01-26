@@ -40,10 +40,14 @@ const adPlatformer = (podcast, adCampaigns) => {
   const adMap = mapAdsById(adCampaigns)
   let podAudio = podcast.audio
 
+  // Get all ad campaigns by this podcast's ids
   let podCampaigns = adMap[podcast.id] || []
 
+  // go through each campaign (which is sorted by total revenue)
   podCampaigns.forEach((campaignSummary) => {
+    // see if the ad slots match (via regex pattern)
     if(podAudio.match(campaignSummary.targetPattern)) {
+      // if they do, replace allthe spots with ads
       campaignSummary.campaign.forEach((ad) => {
         podAudio = podAudio.replace(`[${ad.type}]`, ad.audio)
       })
