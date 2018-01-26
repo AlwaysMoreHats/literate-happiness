@@ -32,7 +32,8 @@ const podcasts = argPodcasts || podcastTestData
 const adCampaigns = argAdCampaigns || adCampaignTestData
 
 podcasts.forEach((podcast) => {
-  console.log(podcast.id, podcast.audio, adPlatformer(podcast, adCampaigns))
+  const result = adPlatformer(podcast, adCampaigns)
+  console.log(result.id, podcast.audio, result.audio, result.revenue)
 })
 
 // console.log(podcasts[0].audio, adPlatformer(podcasts[0], adCampaigns))

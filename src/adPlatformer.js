@@ -46,10 +46,13 @@ const adPlatformer = (podcast, adCampaigns) => {
   // Get all ad campaigns by this podcast's ids
   let podCampaigns = adMap[podcast.id] || []
 
+  let revenue = 0
+
   // go through each campaign (which is sorted by total revenue)
   podCampaigns.forEach((campaignSummary) => {
     // see if the ad slots match (via regex pattern)
     if(podAudio.match(campaignSummary.targetPattern)) {
+      revenue += campaignSummary.totalRevenue
       // if they do, replace allthe spots with ads
       campaignSummary.campaign.forEach((ad) => {
         podAudio = podAudio.replace(`[${ad.type}]`, ad.audio)
@@ -59,7 +62,11 @@ const adPlatformer = (podcast, adCampaigns) => {
 
   podAudio = podAudio.replace(/\[[MIDPREOST]{3,4}\]/g, '')
 
-  return podAudio
+  return {
+    id: podcast.id,
+    audio: podAudio,
+    revenue
+  }
 }
 
 export default adPlatformer
