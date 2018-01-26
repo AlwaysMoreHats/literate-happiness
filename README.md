@@ -2,6 +2,9 @@
 
 ## How to use
 
+Node Version: 9.2
+NPM version: 5.6
+
 Assuming you have checked out a branch, run `npm install` to install necessary node modules
 
 To run the program, type `npm start`. This will run the program with test data. If you want to run
