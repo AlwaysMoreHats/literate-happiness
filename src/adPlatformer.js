@@ -39,6 +39,48 @@ const mapAdsById = (adCampaigns) => {
   return adMap
 }
 
+const applyAds = (podAudio, podCampaigns) => {
+  let mostValuable = {podAudio, revenue: 0} //fake node to start
+
+  const makeLeaf = (podAudio, podCampaigns, currentRevenue) => {
+    if(podCampaigns.length === 0) {
+      return null
+    }
+
+    // go through each campaign (which is sorted by total revenue)
+    podCampaigns.forEach((campaignSummary) => {
+      // see if the ad slots match (via regex pattern)
+      if(podAudio.match(campaignSummary.targetPattern)) {
+        let newAudio = podAudio
+
+        // if they do, replace all the spots with ads
+        campaignSummary.campaign.forEach((ad) => {
+          newAudio = newAudio.replace(`[${ad.type}]`, ad.audio)
+        })
+
+        let remainingCampaigns = podCampaigns
+          .filter(campaignData => campaignData !== campaignSummary) // filter out this campaign
+          .filter(campaignData => newAudio.match(campaignData.targetPattern)) // only include matching
+
+        const revenue = currentRevenue + campaignSummary.totalRevenue
+
+        makeLeaf(newAudio, remainingCampaigns, revenue)
+
+        if(mostValuable.revenue < revenue) {
+          mostValuable = {
+            podAudio: newAudio,
+            revenue,
+          }
+        }
+      }
+    })
+  }
+
+  // it's arbor day
+  makeLeaf(podAudio, podCampaigns, 0)
+  return mostValuable
+}
+
 const adPlatformer = (podcast, adCampaigns) => {
   const adMap = mapAdsById(adCampaigns)
   let podAudio = podcast.audio
@@ -46,26 +88,17 @@ const adPlatformer = (podcast, adCampaigns) => {
   // Get all ad campaigns by this podcast's ids
   let podCampaigns = adMap[podcast.id] || []
 
-  let revenue = 0
+  //filter out all unusable pods
+  podCampaigns = podCampaigns.filter(campaignData => podAudio.match(campaignData.targetPattern))
 
-  // go through each campaign (which is sorted by total revenue)
-  podCampaigns.forEach((campaignSummary) => {
-    // see if the ad slots match (via regex pattern)
-    if(podAudio.match(campaignSummary.targetPattern)) {
-      revenue += campaignSummary.totalRevenue
-      // if they do, replace allthe spots with ads
-      campaignSummary.campaign.forEach((ad) => {
-        podAudio = podAudio.replace(`[${ad.type}]`, ad.audio)
-      })
-    }
-  })
+  const mostValuableCast = applyAds(podAudio, podCampaigns)
 
-  podAudio = podAudio.replace(/\[[MIDPREOST]{3,4}\]/g, '')
+  podAudio = mostValuableCast.podAudio.replace(/\[[MIDPREOST]{3,4}\]/g, '')
 
   return {
     id: podcast.id,
     audio: podAudio,
-    revenue
+    revenue: mostValuableCast.revenue
   }
 }
 
