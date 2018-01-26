@@ -7,6 +7,7 @@ const mapAdsById = (adCampaigns) => {
     const spotCounts = { PRE: 0, MID: 0, POST: 0 }
     let totalRevenue = 0
 
+    // fill in counts/revenue
     campaign.forEach((c) => {
       spotCounts[c.type] += 1
       totalRevenue += c.revenue
@@ -19,6 +20,7 @@ const mapAdsById = (adCampaigns) => {
       campaign
     }
 
+    // assign the summary by the campaign ID
     campaign[0].targets.forEach((target) => {
       let targetCollection = adMap[target]
       if(!targetCollection) {
@@ -29,6 +31,7 @@ const mapAdsById = (adCampaigns) => {
     })
   })
 
+  // sort it by total revenue
   Object.keys(adMap).forEach((podKey) => {
     adMap[podKey].sort((a, b) => b.totalRevenue - a.totalRevenue)
   })
