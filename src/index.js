@@ -28,5 +28,9 @@ if(argAdCampaigns) {
   }
 }
 
+const podcasts = argPodcasts || podcastTestData
+const adCampaigns = argAdCampaigns || adCampaignTestData
 
-adPlatformer(argPodcasts || podcastTestData, argAdCampaigns || adCampaignTestData)
+podcasts.forEach((podcast) => {
+  adPlatformer(podcast, adCampaigns)
+})
